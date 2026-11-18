@@ -16,8 +16,8 @@ Rutas relativas a `C:\Users\Gabriel\AndroidStudioProjects\`. Proyectos separados
 ## 3. Petición HTTP (Ktor Client) y URL/puerto
 - Cliente: `AlgrebraQuest\shared\src\commonMain\kotlin\com\example\algrebraquest\data\ApiClient.kt` (`ApiClient.login` → `POST /auth/login`).
 - URL base por plataforma (puerto 8080, backend en `main()` de `Application.kt`):
-  - Android (emulador): `shared\src\androidMain\...\platform\PlatformServices.android.kt` → `http://10.0.2.2:8080`
-  - iOS: `shared\src\iosMain\...\platform\PlatformServices.ios.kt` → `http://localhost:8080`
+  - Android (emulador): `shared\src\androidMain\...\platform\PlatformServices.android.kt` → `https://algebraquest-backend-production.up.railway.app`
+  - iOS: `shared\src\iosMain\...\platform\PlatformServices.ios.kt` → `https://algebraquest-backend-production.up.railway.app`
   - Editable en la pantalla de login ("Configurar servidor Ktor") → `AppViewModel.setServerUrl`.
 - `androidApp\src\main\AndroidManifest.xml`: permiso `INTERNET` y `usesCleartextTraffic="true"` (HTTP sin TLS).
 

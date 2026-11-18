@@ -61,7 +61,13 @@ fun RankingScreen(state: UiState, vm: AppViewModel) {
         }
     }
 
-    LaunchedEffect(Unit) { refresh() }
+    // Actualización periódica cada 10 s (casi tiempo real)
+    LaunchedEffect(Unit) {
+        while (true) {
+            refresh()
+            kotlinx.coroutines.delay(10_000)
+        }
+    }
 
     val currentUsername = state.session?.username
     val isStudent = state.session?.role == Role.ALUMNO

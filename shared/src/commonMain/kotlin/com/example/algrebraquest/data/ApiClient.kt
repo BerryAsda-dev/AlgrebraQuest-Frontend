@@ -36,20 +36,8 @@ class ApiClient(
     }
     var token: String? = null
 
-    /**
-     * Si otra parte de la app envía por defecto una IP local vieja (10.0.2.2 o localhost),
-     * redirige automáticamente a la URL de Railway.
-     */
-    private fun resolveBaseUrl(): String {
-        val raw = baseUrl().trim().trimEnd('/')
-        return if (raw.isBlank() || raw.contains("10.0.2.2") || raw.contains("localhost") || raw.contains("127.0.0.1")) {
-            RAILWAY_BASE_URL
-        } else if (!raw.startsWith("http://") && !raw.startsWith("https://")) {
-            "https://$raw"
-        } else {
-            raw
-        }
-    }
+    /** La app SIEMPRE usa el servidor de Railway; no existe modo local. */
+    private fun resolveBaseUrl(): String = RAILWAY_BASE_URL
 
     private suspend fun call(
         method: HttpMethod, path: String, auth: Boolean = true, block: HttpRequestBuilder.() -> Unit = {},
@@ -113,7 +101,7 @@ class ApiClient(
             jsonBody(CheckRequest(worldId, levelId, index, option))
         }.body<CheckResponse>().correct
 
-    // ---------- A-05 a A-08: Jugador (PlayerRoutes.kt) ----------
+    // ---------- Hola esto es un mensaje de prueba ----------
     suspend fun playerLogin(username: String = "", displayName: String = ""): PlayerState =
         call(HttpMethod.Post, "/api/jugadores/login") {
             jsonBody(PlayerLoginRequest(username, displayName))

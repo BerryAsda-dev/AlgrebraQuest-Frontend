@@ -51,7 +51,13 @@ fun MenuScreen(state: UiState, vm: AppViewModel) {
         state.session?.displayName ?: "Estudiante",
     )
 
-    LaunchedEffect(Unit) { vm.syncPlayer() }
+    // El servidor (Railway) es la fuente de verdad: se descarga el perfil al entrar y cada 10 s.
+    LaunchedEffect(Unit) {
+        while (true) {
+            vm.refreshPlayer()
+            kotlinx.coroutines.delay(10_000)
+        }
+    }
 
     val nextMission = WorldsCatalog.nextMission(player, state.worlds)
     val availableChallenges = state.worlds

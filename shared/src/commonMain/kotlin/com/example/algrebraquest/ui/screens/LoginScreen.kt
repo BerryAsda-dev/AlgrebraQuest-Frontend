@@ -146,6 +146,17 @@ fun LoginScreen(state: UiState, vm: AppViewModel) {
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
+                            "Kevin Gabriel Ramirez Vargas 18-Nov-2026",
+                            color = Aq.Mint,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 1.2.sp,
+                        )
+
+
+
+
+                        Text(
                             "PORTAL DE ACCESO",
                             color = Aq.Mint,
                             fontSize = 11.sp,
@@ -504,7 +515,7 @@ fun LoginScreen(state: UiState, vm: AppViewModel) {
             if (showServer) {
                 AqCard(Modifier.fillMaxWidth()) {
                     Text(
-                        "Dirección del backend Ktor (A-01 /health).\n• Emulador Android: http://10.0.2.2:8080\n• Dispositivo físico en red local: http://TU-IP-LOCAL:8080",
+                        "Dirección del backend Ktor (A-01 /health).\n• Producción (Railway): https://algebraquest-backend-production.up.railway.app",
                         color = Aq.Muted,
                         fontSize = 12.sp,
                     )
