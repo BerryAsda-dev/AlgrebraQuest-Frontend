@@ -113,7 +113,7 @@ class ApiClient(
             jsonBody(CheckRequest(worldId, levelId, index, option))
         }.body<CheckResponse>().correct
 
-    // ---------- A-05 a A-08: Jugador (PlayerRoutes.kt) ----------
+    // ---------- Hola esto es un mensaje de prueba ----------
     suspend fun playerLogin(username: String = "", displayName: String = ""): PlayerState =
         call(HttpMethod.Post, "/api/jugadores/login") {
             jsonBody(PlayerLoginRequest(username, displayName))
