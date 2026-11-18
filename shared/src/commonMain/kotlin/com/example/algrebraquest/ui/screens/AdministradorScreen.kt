@@ -68,7 +68,13 @@ fun AdministradorScreen(state: UiState, vm: AppViewModel) {
         }
     }
 
-    LaunchedEffect(Unit) { refresh() }
+    // Actualización periódica cada 10 s (casi tiempo real)
+    LaunchedEffect(Unit) {
+        while (true) {
+            refresh()
+            kotlinx.coroutines.delay(10_000)
+        }
+    }
 
     val sessionUser = state.session?.username ?: "admin"
     val bioEnrolled = state.isBiometricEnrolledFor(sessionUser)
