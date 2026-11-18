@@ -62,10 +62,8 @@ fun rootRouteFor(role: Role): Route = when (role) {
 }
 
 class AppViewModel(private val services: PlatformServices = platformServices()) : ViewModel() {
-    // Ignora URLs locales guardadas de pruebas anteriores (localhost, 10.0.2.2, IP de red local)
-    private var serverUrl: String = services.secure.serverUrl
-        ?.takeIf { it.startsWith("https://") }
-        ?: services.defaultServerUrl
+    // Servidor fijo: Railway. Se ignora cualquier URL guardada o local.
+    private var serverUrl: String = com.example.algrebraquest.data.RAILWAY_BASE_URL
     private val api = ApiClient { serverUrl }
 
     private val _state = MutableStateFlow(UiState(serverUrl = serverUrl))
@@ -88,14 +86,8 @@ class AppViewModel(private val services: PlatformServices = platformServices()) 
     }
 
     fun setServerUrl(url: String) {
-        val clean = url.trim().trimEnd('/')
-        if (!clean.startsWith("http://") && !clean.startsWith("https://")) {
-            fail("La dirección del servidor debe empezar con http:// o https://")
-            return
-        }
-        serverUrl = clean
-        services.secure.serverUrl = clean
-        _state.update { it.copy(serverUrl = clean, error = null, notice = "Servidor actualizado a $clean") }
+        // El servidor es fijo (Railway); el campo del login ya no puede cambiarlo.
+        _state.update { it.copy(serverUrl = serverUrl, error = null, notice = "El servidor es Railway: $serverUrl") }
         checkServerHealth()
     }
 
