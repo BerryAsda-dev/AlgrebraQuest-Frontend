@@ -62,7 +62,10 @@ fun rootRouteFor(role: Role): Route = when (role) {
 }
 
 class AppViewModel(private val services: PlatformServices = platformServices()) : ViewModel() {
-    private var serverUrl: String = services.secure.serverUrl ?: services.defaultServerUrl
+    // Ignora URLs locales guardadas de pruebas anteriores (localhost, 10.0.2.2, IP de red local)
+    private var serverUrl: String = services.secure.serverUrl
+        ?.takeIf { it.startsWith("https://") }
+        ?: services.defaultServerUrl
     private val api = ApiClient { serverUrl }
 
     private val _state = MutableStateFlow(UiState(serverUrl = serverUrl))

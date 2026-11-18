@@ -27,7 +27,7 @@ private class MemorySecureStore : SecureStore {
 }
 
 actual fun platformServices(): PlatformServices =
-    PlatformServices(IosBiometricGate(), MemorySecureStore(), "http://localhost:8080")
+    PlatformServices(IosBiometricGate(), MemorySecureStore(), "https://algebraquest-backend-production.up.railway.app")
 
 @Composable
 actual fun PlatformBackHandler(enabled: Boolean, onBack: () -> Unit) {
