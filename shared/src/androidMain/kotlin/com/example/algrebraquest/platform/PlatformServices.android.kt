@@ -257,7 +257,7 @@ private class AndroidSecureStore(context: Context) : SecureStore {
 actual fun platformServices(): PlatformServices {
     val context = checkNotNull(AndroidHost.appContext) { "AndroidHost.attach(activity) debe llamarse en onCreate" }
     // 10.0.2.2 es el equipo anfitrión visto desde el emulador de Android.
-    return PlatformServices(AndroidBiometricGate(), AndroidSecureStore(context), "http://10.0.2.2:8080")
+    return PlatformServices(AndroidBiometricGate(), AndroidSecureStore(context), "https://algebraquest-backend-production.up.railway.app")
 }
 
 @Composable
