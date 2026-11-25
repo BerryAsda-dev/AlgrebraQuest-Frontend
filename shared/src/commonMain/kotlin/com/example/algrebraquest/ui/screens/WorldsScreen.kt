@@ -25,6 +25,7 @@ import com.example.algrebraquest.ui.AppViewModel
 import com.example.algrebraquest.ui.ScreenFrame
 import com.example.algrebraquest.ui.UiState
 import com.example.algrebraquest.ui.theme.Aq
+import com.example.algrebraquest.ui.theme.AdaptiveGrid
 import com.example.algrebraquest.ui.theme.BackPill
 import com.example.algrebraquest.ui.theme.ProgressBar
 import com.example.algrebraquest.ui.theme.ScreenHeader
@@ -50,7 +51,13 @@ fun WorldsScreen(state: UiState, vm: AppViewModel) {
             subtitle = "Completa todos los niveles de un mundo para desbloquear el siguiente.",
         )
 
-        state.worlds.forEach { mundo ->
+        AdaptiveGrid(
+            items = state.worlds,
+            wideColumns = 4,
+            tabletColumns = 2,
+            phoneColumns = 1,
+            spacing = 14.dp,
+        ) { mundo, itemModifier ->
             val unlocked = WorldsCatalog.worldUnlocked(player, mundo, state.worlds)
             val completed = unlocked && WorldsCatalog.worldDone(player, mundo)
             val doneCount = WorldsCatalog.completedCount(player, mundo)
@@ -66,8 +73,7 @@ fun WorldsScreen(state: UiState, vm: AppViewModel) {
             }
 
             Column(
-                Modifier
-                    .fillMaxWidth()
+                itemModifier
                     .alpha(if (unlocked) 1f else 0.55f)
                     .clip(RoundedCornerShape(18.dp))
                     .background(Aq.Panel)

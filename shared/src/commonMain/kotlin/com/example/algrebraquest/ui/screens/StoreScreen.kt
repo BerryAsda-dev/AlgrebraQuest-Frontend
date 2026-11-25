@@ -29,6 +29,7 @@ import com.example.algrebraquest.ui.AppViewModel
 import com.example.algrebraquest.ui.ScreenFrame
 import com.example.algrebraquest.ui.UiState
 import com.example.algrebraquest.ui.theme.Aq
+import com.example.algrebraquest.ui.theme.AdaptiveGrid
 import com.example.algrebraquest.ui.theme.AqButton
 import com.example.algrebraquest.ui.theme.AqButtonStyle
 import com.example.algrebraquest.ui.theme.AqCard
@@ -122,13 +123,18 @@ fun StoreScreen(state: UiState, vm: AppViewModel) {
 
         // ---------- Colección de los 4 Trofeos ----------
         SectionTitle("Colección de Trofeos (aparecen en Logros)")
-        TROPHIES.forEach { trophy ->
+        AdaptiveGrid(
+            items = TROPHIES,
+            wideColumns = 2,
+            tabletColumns = 2,
+            phoneColumns = 1,
+            spacing = 10.dp,
+        ) { trophy, itemModifier ->
             val owned = trophy.id in player.trofeos
             val affordable = player.monedas >= trophy.precio
 
             Column(
-                Modifier
-                    .fillMaxWidth()
+                itemModifier
                     .clip(RoundedCornerShape(16.dp))
                     .background(Aq.Panel)
                     .border(

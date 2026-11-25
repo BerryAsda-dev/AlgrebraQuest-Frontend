@@ -1,0 +1,3 @@
+# Apache: sirve WebAssembly con el MIME correcto
+AddType application/wasm .wasm
+AddType application/javascript .mjs

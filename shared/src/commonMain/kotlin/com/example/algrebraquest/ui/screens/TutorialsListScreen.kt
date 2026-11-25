@@ -28,6 +28,7 @@ import com.example.algrebraquest.ui.AppViewModel
 import com.example.algrebraquest.ui.ScreenFrame
 import com.example.algrebraquest.ui.UiState
 import com.example.algrebraquest.ui.theme.Aq
+import com.example.algrebraquest.ui.theme.AdaptiveGrid
 import com.example.algrebraquest.ui.theme.AqCard
 import com.example.algrebraquest.ui.theme.AqTextField
 import com.example.algrebraquest.ui.theme.BackPill
@@ -72,22 +73,22 @@ fun TutorialsListScreen(state: UiState, vm: AppViewModel) {
             label = "⌕ Buscar un tema o mundo",
         )
 
-        // Filtros por mundo
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        // Filtros por mundo: 5 columnas en escritorio, 2 en tablet y 1 en teléfono.
+        val filters = listOf<WorldFilter>(WorldFilter("todos", "Todos")) +
+            state.worlds.map { WorldFilter(it.id, "${it.icono} ${it.nombre.take(12)}") }
+        AdaptiveGrid(
+            items = filters,
+            wideColumns = 5,
+            tabletColumns = 2,
+            phoneColumns = 1,
+            spacing = 6.dp,
+        ) { filter, itemModifier ->
             WorldFilterPill(
-                label = "Todos",
-                active = worldFilter == "todos",
-                onClick = { worldFilter = "todos" },
-                modifier = Modifier.weight(1f),
+                label = filter.label,
+                active = worldFilter == filter.id,
+                onClick = { worldFilter = filter.id },
+                modifier = itemModifier,
             )
-            state.worlds.forEach { mundo ->
-                WorldFilterPill(
-                    label = "${mundo.icono} ${mundo.nombre.take(7)}",
-                    active = worldFilter == mundo.id,
-                    onClick = { worldFilter = mundo.id },
-                    modifier = Modifier.weight(1f),
-                )
-            }
         }
 
         if (filteredTopics.isEmpty()) {
@@ -151,6 +152,8 @@ fun TutorialsListScreen(state: UiState, vm: AppViewModel) {
         }
     }
 }
+
+private data class WorldFilter(val id: String, val label: String)
 
 @Composable
 private fun WorldFilterPill(

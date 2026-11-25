@@ -1,4 +1,6 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -9,6 +11,20 @@ plugins {
 }
 
 kotlin {
+    // Web (Kotlin/Wasm): misma interfaz de commonMain en el navegador de escritorio
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        outputModuleName.set("algebraQuestApp")
+        browser {
+            commonWebpackConfig {
+                outputFileName = "algebraQuestApp.js"
+                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+                    port = 8080
+                }
+            }
+        }
+        binaries.executable()
+    }
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -48,6 +64,9 @@ kotlin {
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
+        }
+        wasmJsMain.dependencies {
+            implementation(libs.ktor.client.js)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)

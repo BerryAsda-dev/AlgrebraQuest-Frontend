@@ -25,6 +25,7 @@ import com.example.algrebraquest.ui.AppViewModel
 import com.example.algrebraquest.ui.ScreenFrame
 import com.example.algrebraquest.ui.UiState
 import com.example.algrebraquest.ui.theme.Aq
+import com.example.algrebraquest.ui.theme.AdaptiveGrid
 import com.example.algrebraquest.ui.theme.AqButton
 import com.example.algrebraquest.ui.theme.AqButtonStyle
 import com.example.algrebraquest.ui.theme.AqCard
@@ -99,10 +100,15 @@ fun AchievementsScreen(state: UiState, vm: AppViewModel) {
 
         // ---------- Lista de Logros ----------
         SectionTitle("Medallas de Logros")
-        achievements.forEach { ach ->
+        AdaptiveGrid(
+            items = achievements,
+            wideColumns = 3,
+            tabletColumns = 2,
+            phoneColumns = 1,
+            spacing = 10.dp,
+        ) { ach, itemModifier ->
             Row(
-                Modifier
-                    .fillMaxWidth()
+                itemModifier
                     .alpha(if (ach.logrado) 1f else 0.55f)
                     .clip(RoundedCornerShape(16.dp))
                     .background(Aq.Panel)

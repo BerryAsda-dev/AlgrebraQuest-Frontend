@@ -1,0 +1,15 @@
+# Para Nginx: incluir con  include /ruta/a/mime.types;  dentro de http { }
+types {
+    text/html                 html htm;
+    text/css                  css;
+    application/javascript    js mjs;
+    application/wasm          wasm;
+    application/json          json map;
+    image/jpeg                jpeg jpg;
+    image/png                 png;
+    image/svg+xml             svg;
+    image/x-icon              ico;
+    font/ttf                  ttf;
+    font/woff2                woff2;
+    application/octet-stream  bin;
+}

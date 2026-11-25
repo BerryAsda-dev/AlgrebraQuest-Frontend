@@ -14,7 +14,7 @@ Aplicación móvil educativa de Álgebra Universitaria con autenticación por ro
 
 ## 2. Rutas de navegación implementadas (R-01 a R-12)
 
-- **R-01 (`LoginScreen.kt` / `AlgebraQuestApp.kt`)**: Nueva interfaz principal de inicio de sesión con selector por rol (`Alumno`, `Supervisor`, `Administrador`), chips de autocompletado, validación de estado del servidor (`/health`) y panel de **Sensor Biométrico** con botones dedicados para **Huella dactilar** y **Reconocimiento facial**.
+- **R-01 (`LoginScreen.kt` / `AlgebraQuestApp.kt`)**: Acceso responsivo para los roles existentes, redirección según el rol verificado por el servidor y registro limitado a alumnos. Incluye validación de campos, estados de carga, mensajes del servidor, visibilidad de contraseña y acceso biométrico.
 - **R-02 (`AdministradorScreen.kt`)**: Resumen de cuentas, estado de los 4 mundos, control/revocación de sesiones activas, reinicio de progreso de alumnos y configuración biométrica del administrador.
 - **R-03 (`TeacherRankingScreen.kt` / `SupervisorScreen`)**: Ranking del aula filtrado por mundo, avance individual de alumnos por mundo y bitácora de respuestas en tiempo real.
 - **R-04 (`HomeScreen.kt` / `AlumnoScreen`)**: Perfil activo del alumno, ejercicio interactivo de práctica (`2x + 3 = 11`), barra de progreso general, configuración biométrica y botón **Jugar**.
@@ -31,6 +31,7 @@ Aplicación móvil educativa de Álgebra Universitaria con autenticación por ro
 
 - **A-01**: `GET /health` (`Application.kt`)
 - **A-02**: `POST /auth/login` (`Application.kt`)
+- **Registro**: `POST /auth/register` (`Application.kt` / `Store.kt`), crea únicamente cuentas de alumno y devuelve una sesión.
 - **A-03**: `GET /auth/me` (`Application.kt`)
 - **A-04**: `POST /auth/logout` (`Application.kt`)
 - **Biometría**: `POST /auth/biometric/enroll`, `POST /auth/biometric/login`, `DELETE /auth/biometric` (`Application.kt`)

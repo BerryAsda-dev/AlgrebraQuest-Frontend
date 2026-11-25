@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -207,6 +208,45 @@ fun StatChip(label: String, value: String, modifier: Modifier = Modifier, accent
     }
 }
 
+/**
+ * Cuadrícula adaptable utilizada por las vistas originales: 4 columnas en escritorio,
+ * 2 en tablet y 1 en teléfono. Los cards conservan el mismo ancho visual sin desbordar.
+ */
+@Composable
+fun <T> AdaptiveGrid(
+    items: List<T>,
+    modifier: Modifier = Modifier,
+    wideColumns: Int = 4,
+    tabletColumns: Int = 2,
+    phoneColumns: Int = 1,
+    spacing: Dp = 10.dp,
+    itemContent: @Composable (item: T, itemModifier: Modifier) -> Unit,
+) {
+    BoxWithConstraints(modifier.fillMaxWidth()) {
+        val columns = when {
+            maxWidth >= 840.dp -> wideColumns
+            maxWidth >= 600.dp -> tabletColumns
+            else -> phoneColumns
+        }.coerceAtLeast(1)
+
+        Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(spacing)) {
+            items.chunked(columns).forEach { rowItems ->
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(spacing),
+                ) {
+                    rowItems.forEach { item ->
+                        itemContent(item, Modifier.weight(1f))
+                    }
+                    repeat(columns - rowItems.size) {
+                        Box(Modifier.weight(1f))
+                    }
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun AqTextField(
     value: String,
@@ -217,13 +257,17 @@ fun AqTextField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     trailing: (@Composable () -> Unit)? = null,
+    error: String? = null,
 ) {
     OutlinedTextField(
         value = value, onValueChange = onValueChange, label = { Text(label) }, singleLine = true, enabled = enabled,
         visualTransformation = visualTransformation, keyboardOptions = keyboardOptions, trailingIcon = trailing,
+        isError = error != null,
+        supportingText = error?.let { msg -> { Text(msg, color = Aq.Red, fontSize = 11.sp) } },
         modifier = modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Aq.Gold, unfocusedBorderColor = Aq.Border,
+            focusedBorderColor = Aq.Gold, unfocusedBorderColor = Aq.Border, errorBorderColor = Aq.Red,
+            errorLabelColor = Aq.Red, errorTextColor = Aq.Text, errorContainerColor = Aq.Panel2, errorCursorColor = Aq.Red,
             focusedLabelColor = Aq.Gold, unfocusedLabelColor = Aq.Muted,
             focusedTextColor = Aq.Text, unfocusedTextColor = Aq.Text, cursorColor = Aq.Gold,
             focusedContainerColor = Aq.Panel2, unfocusedContainerColor = Aq.Panel2,

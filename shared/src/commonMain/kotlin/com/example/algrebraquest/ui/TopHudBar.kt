@@ -4,9 +4,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -80,7 +84,11 @@ fun TopHudBar(player: PlayerState, onOpenStore: () -> Unit, onOpenSettings: () -
     }
 }
 
-/** Marco común de las pantallas: fondo, HUD opcional y contenido desplazable. */
+/**
+ * Marco común de las pantallas: fondo, HUD opcional y contenido desplazable.
+ * Responsivo: en teléfonos usa todo el ancho; en tablets y escritorio centra el contenido
+ * con un ancho máximo y aumenta el margen para evitar líneas demasiado largas.
+ */
 @Composable
 fun ScreenFrame(
     state: UiState,
@@ -90,19 +98,28 @@ fun ScreenFrame(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     AqBackground {
-        Column(Modifier.fillMaxSize().safeContentPadding()) {
-            val player = state.player
-            if (showHud && player != null) {
-                TopHudBar(player, onOpenStore = { vm.navigate(com.example.algrebraquest.domain.Route.Store) },
-                    onOpenSettings = { vm.navigate(com.example.algrebraquest.domain.Route.Settings) })
+        BoxWithConstraints(Modifier.fillMaxSize().safeContentPadding()) {
+            val padding = when {
+                maxWidth >= 840.dp -> 32.dp
+                maxWidth >= 600.dp -> 24.dp
+                else -> 16.dp
             }
-            Column(
-                Modifier.weight(1f).fillMaxWidth()
-                    .then(if (scroll) Modifier.verticalScroll(rememberScrollState()) else Modifier)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-                content = content,
-            )
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+                Column(Modifier.fillMaxHeight().fillMaxWidth().widthIn(max = 900.dp)) {
+                    val player = state.player
+                    if (showHud && player != null) {
+                        TopHudBar(player, onOpenStore = { vm.navigate(com.example.algrebraquest.domain.Route.Store) },
+                            onOpenSettings = { vm.navigate(com.example.algrebraquest.domain.Route.Settings) })
+                    }
+                    Column(
+                        Modifier.weight(1f).fillMaxWidth()
+                            .then(if (scroll) Modifier.verticalScroll(rememberScrollState()) else Modifier)
+                            .padding(padding),
+                        verticalArrangement = Arrangement.spacedBy(14.dp),
+                        content = content,
+                    )
+                }
+            }
         }
     }
 }

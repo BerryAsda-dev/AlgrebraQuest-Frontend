@@ -62,16 +62,10 @@ fun rootRouteFor(role: Role): Route = when (role) {
 }
 
 class AppViewModel(private val services: PlatformServices = platformServices()) : ViewModel() {
-<<<<<<< main
-    // Ignora URLs locales guardadas de pruebas anteriores (localhost, 10.0.2.2, IP de red local)
-    private var serverUrl: String = services.secure.serverUrl
-        ?.takeIf { it.startsWith("https://") }
-        ?: services.defaultServerUrl
-=======
     // Servidor fijo: Railway. Se ignora cualquier URL guardada o local.
     private var serverUrl: String = com.example.algrebraquest.data.RAILWAY_BASE_URL
->>>>>>> documentacion-arquitectura
     private val api = ApiClient { serverUrl }
+    private val registerApi = com.example.algrebraquest.data.RegisterApi()
 
     private val _state = MutableStateFlow(UiState(serverUrl = serverUrl))
     val state: StateFlow<UiState> = _state.asStateFlow()
@@ -120,6 +114,22 @@ class AppViewModel(private val services: PlatformServices = platformServices()) 
         viewModelScope.launch {
             try {
                 startSession(api.login(username.trim(), password), viaBiometric = false)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                api.token = null
+                fail(e.message)
+            }
+        }
+    }
+
+    /** Crea una cuenta de ALUMNO en el servidor e inicia sesión con ella. */
+    fun register(username: String, displayName: String, password: String) {
+        if (_state.value.loading) return
+        _state.update { it.copy(loading = true, error = null, notice = null) }
+        viewModelScope.launch {
+            try {
+                startSession(registerApi.register(username.trim(), displayName.trim(), password), viaBiometric = false)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -365,6 +375,7 @@ class AppViewModel(private val services: PlatformServices = platformServices()) 
 
     override fun onCleared() {
         api.close()
+        registerApi.close()
         super.onCleared()
     }
 }

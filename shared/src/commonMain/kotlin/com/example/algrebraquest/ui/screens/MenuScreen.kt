@@ -30,6 +30,7 @@ import com.example.algrebraquest.ui.AppViewModel
 import com.example.algrebraquest.ui.ScreenFrame
 import com.example.algrebraquest.ui.UiState
 import com.example.algrebraquest.ui.theme.Aq
+import com.example.algrebraquest.ui.theme.AdaptiveGrid
 import com.example.algrebraquest.ui.theme.AqButton
 import com.example.algrebraquest.ui.theme.AqButtonStyle
 import com.example.algrebraquest.ui.theme.AqCard
@@ -161,90 +162,46 @@ fun MenuScreen(state: UiState, vm: AppViewModel) {
         }
 
         // ---------- Cuadrícula de accesos principales (menu-shortcuts de menu.js) ----------
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        val shortcuts = listOf(
+            MenuShortcut("🗺️", "Mundos", "Los 4 mundos de Álgebra", Aq.Green) { vm.navigate(Route.Worlds) },
+            MenuShortcut("📚", "Tutoriales", "Temas y videos de apoyo", Aq.Mint) { vm.navigate(Route.TutorialsList) },
+            MenuShortcut("🛒", "Tienda", "Trofeos y vidas extra", Aq.Gold) { vm.navigate(Route.Store) },
+            MenuShortcut("🏆", "Logros", "Tu vitrina y medallas", Aq.Glow) { vm.navigate(Route.Achievements) },
+            MenuShortcut("📊", "Ranking", "Tabla general por XP", Aq.GoldSoft) { vm.navigate(Route.Ranking) },
+            MenuShortcut("⚡", "Reto relámpago", "Nivel disponible al azar", Aq.Mint) {
+                val flash = availableChallenges.randomOrNull() ?: nextMission
+                if (flash != null) vm.navigate(Route.LevelIntro(flash.first.id, flash.second.id))
+                else vm.navigate(Route.Worlds)
+            },
+            MenuShortcut("⚙️", "Ajustes", "Nombre, biometría y datos", Aq.Border) { vm.navigate(Route.Settings) },
+            MenuShortcut("⏻", "Cerrar sesión", "Salir al inicio de sesión", Aq.Red) { vm.logout() },
+        )
+        AdaptiveGrid(
+            items = shortcuts,
+            wideColumns = 3,
+            tabletColumns = 2,
+            phoneColumns = 1,
+            spacing = 10.dp,
+        ) { shortcut, itemModifier ->
             MenuShortcutCard(
-                icon = "🗺️",
-                title = "Mundos",
-                subtitle = "Los 4 mundos de Álgebra",
-                accent = Aq.Green,
-                onClick = { vm.navigate(Route.Worlds) },
-                modifier = Modifier.weight(1f),
-            )
-            MenuShortcutCard(
-                icon = "📚",
-                title = "Tutoriales",
-                subtitle = "Temas y videos de apoyo",
-                accent = Aq.Mint,
-                onClick = { vm.navigate(Route.TutorialsList) },
-                modifier = Modifier.weight(1f),
-            )
-        }
-
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            MenuShortcutCard(
-                icon = "🛒",
-                title = "Tienda",
-                subtitle = "Trofeos y vidas extra",
-                accent = Aq.Gold,
-                onClick = { vm.navigate(Route.Store) },
-                modifier = Modifier.weight(1f),
-            )
-            MenuShortcutCard(
-                icon = "🏆",
-                title = "Logros",
-                subtitle = "Tu vitrina y medallas",
-                accent = Aq.Glow,
-                onClick = { vm.navigate(Route.Achievements) },
-                modifier = Modifier.weight(1f),
-            )
-        }
-
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            MenuShortcutCard(
-                icon = "📊",
-                title = "Ranking",
-                subtitle = "Tabla general por XP",
-                accent = Aq.GoldSoft,
-                onClick = { vm.navigate(Route.Ranking) },
-                modifier = Modifier.weight(1f),
-            )
-            MenuShortcutCard(
-                icon = "⚡",
-                title = "Reto relámpago",
-                subtitle = "Nivel disponible al azar",
-                accent = Aq.Mint,
-                onClick = {
-                    val flash = availableChallenges.randomOrNull() ?: nextMission
-                    if (flash != null) {
-                        vm.navigate(Route.LevelIntro(flash.first.id, flash.second.id))
-                    } else {
-                        vm.navigate(Route.Worlds)
-                    }
-                },
-                modifier = Modifier.weight(1f),
-            )
-        }
-
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            MenuShortcutCard(
-                icon = "⚙️",
-                title = "Ajustes",
-                subtitle = "Nombre, biometría y datos",
-                accent = Aq.Border,
-                onClick = { vm.navigate(Route.Settings) },
-                modifier = Modifier.weight(1f),
-            )
-            MenuShortcutCard(
-                icon = "⏻",
-                title = "Cerrar sesión",
-                subtitle = "Salir al inicio de sesión",
-                accent = Aq.Red,
-                onClick = { vm.logout() },
-                modifier = Modifier.weight(1f),
+                icon = shortcut.icon,
+                title = shortcut.title,
+                subtitle = shortcut.subtitle,
+                accent = shortcut.accent,
+                onClick = shortcut.onClick,
+                modifier = itemModifier,
             )
         }
     }
 }
+
+private data class MenuShortcut(
+    val icon: String,
+    val title: String,
+    val subtitle: String,
+    val accent: androidx.compose.ui.graphics.Color,
+    val onClick: () -> Unit,
+)
 
 @Composable
 private fun MenuShortcutCard(
