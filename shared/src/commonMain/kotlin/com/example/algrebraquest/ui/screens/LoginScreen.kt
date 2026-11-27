@@ -195,6 +195,18 @@ private fun WelcomeScreen(onContinue: () -> Unit, modifier: Modifier) {
                 .padding(vertical = 12.dp),
             textAlign = TextAlign.Center,
         )
+
+        Text(
+            "Prueba",
+            color = Color(0xFFFFF4DE),
+            fontSize = 22.sp,
+            fontWeight = FontWeight.ExtraBold,
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFF21030C))
+                .padding(vertical = 12.dp),
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
