@@ -6,10 +6,7 @@ server {
     root   /usr/share/nginx/html;
     index  index.html;
 
-    # MIME correcto para WebAssembly (necesario para instantiateStreaming)
-    types {
-        application/wasm wasm;
-    }
+    # nginx 1.27 ya incluye application/wasm en /etc/nginx/mime.types por defecto
 
     gzip on;
     gzip_types application/javascript application/wasm text/css application/json;
