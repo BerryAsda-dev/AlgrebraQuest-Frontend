@@ -1,0 +1,7 @@
+# Solo el bundle web y la configuración de nginx entran a la imagen de Railway.
+*
+!Dockerfile
+!deploy
+!deploy/**
+!web-dist
+!web-dist/**

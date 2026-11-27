@@ -542,6 +542,18 @@ private fun AuthPanel(state: UiState, vm: AppViewModel, tab: AuthTab, onTab: (Au
 
         if (tab == AuthTab.LOGIN) BiometricPanel(state, vm)
 
+        // Servidor al que apunta la app (solo lectura; es el backend de Railway)
+        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("Servidor", color = Aq.Muted, fontSize = 10.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+            Text(
+                state.serverUrl,
+                color = Aq.GoldSoft,
+                fontSize = 11.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.clickable { vm.checkServerHealth() },
+            )
+        }
+
         Text(
             "Kevin Gabriel Ramirez Vargas · 18-Nov-2026",
             color = Aq.Muted.copy(alpha = 0.6f),

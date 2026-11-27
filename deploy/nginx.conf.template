@@ -1,0 +1,29 @@
+server {
+    listen       ${PORT};
+    listen       [::]:${PORT};
+    server_name  _;
+
+    root   /usr/share/nginx/html;
+    index  index.html;
+
+    # MIME correcto para WebAssembly (necesario para instantiateStreaming)
+    types {
+        application/wasm wasm;
+    }
+
+    gzip on;
+    gzip_types application/javascript application/wasm text/css application/json;
+    gzip_min_length 1024;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Archivos con hash en el nombre: caché larga. El index y el JS principal siempre frescos.
+    location ~* \.(wasm|jpg|jpeg|png|svg|xml)$ {
+        expires 7d;
+        add_header Cache-Control "public";
+    }
+    location = /index.html { add_header Cache-Control "no-cache"; }
+    location = /algebraQuestApp.js { add_header Cache-Control "no-cache"; }
+}

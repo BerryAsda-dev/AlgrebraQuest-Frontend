@@ -61,6 +61,11 @@ fun rootRouteFor(role: Role): Route = when (role) {
     Role.ALUMNO -> Route.Home
 }
 
+enum class NotificationKind { SUCCESS, INFO, WARNING, ERROR, REWARD }
+
+/** Aviso emergente global (toast) que se muestra sobre cualquier pantalla. */
+data class AppNotification(val id: Long, val kind: NotificationKind, val title: String, val message: String = "")
+
 class AppViewModel(private val services: PlatformServices = platformServices()) : ViewModel() {
     // Servidor fijo: Railway. Se ignora cualquier URL guardada o local.
     private var serverUrl: String = com.example.algrebraquest.data.RAILWAY_BASE_URL
@@ -69,6 +74,18 @@ class AppViewModel(private val services: PlatformServices = platformServices()) 
 
     private val _state = MutableStateFlow(UiState(serverUrl = serverUrl))
     val state: StateFlow<UiState> = _state.asStateFlow()
+
+    // ---------------- Notificaciones ----------------
+    private var nextNotificationId = 0L
+    private val _notifications = MutableStateFlow<List<AppNotification>>(emptyList())
+    val notifications: StateFlow<List<AppNotification>> = _notifications.asStateFlow()
+
+    fun pushNotification(kind: NotificationKind, title: String, message: String = "") {
+        val n = AppNotification(nextNotificationId++, kind, title, message)
+        _notifications.update { (it + n).takeLast(3) }
+    }
+
+    fun dismissNotification(id: Long) = _notifications.update { list -> list.filterNot { it.id == id } }
 
     init {
         refreshBiometric()
@@ -82,7 +99,10 @@ class AppViewModel(private val services: PlatformServices = platformServices()) 
     fun checkServerHealth() {
         viewModelScope.launch {
             val ok = api.health()
+            val before = _state.value.serverHealthy
             _state.update { it.copy(serverHealthy = ok) }
+            if (before == true && !ok) pushNotification(NotificationKind.ERROR, "Sin conexión", "No se pudo contactar con el servidor de Railway.")
+            if (before == false && ok) pushNotification(NotificationKind.SUCCESS, "Conexión restablecida", "El servidor volvió a estar en línea.")
         }
     }
 
@@ -202,6 +222,7 @@ class AppViewModel(private val services: PlatformServices = platformServices()) 
         val creds = services.secure.loadAllBiometricCredentials()
         val alreadyEnrolled = creds.any { it.username.equals(verifiedUser.username, ignoreCase = true) }
         val offer = !viaBiometric && services.biometric.status() == BiometricStatus.AVAILABLE && !alreadyEnrolled
+        pushNotification(NotificationKind.SUCCESS, "¡Bienvenido, ${verifiedUser.displayName}!", "Sesión iniciada como ${role.title}.")
         _state.update {
             it.copy(
                 loading = false,
@@ -277,6 +298,7 @@ class AppViewModel(private val services: PlatformServices = platformServices()) 
         _state.update { it.copy(loading = true) }
         viewModelScope.launch {
             try { api.logout() } catch (e: CancellationException) { throw e } catch (_: Exception) {}
+            pushNotification(NotificationKind.INFO, "Sesión cerrada", "¡Hasta pronto!")
             clearSession(null, "Sesión cerrada correctamente")
         }
     }
@@ -322,6 +344,7 @@ class AppViewModel(private val services: PlatformServices = platformServices()) 
         throw e
     } catch (e: ApiFailure) {
         if (e.isUnauthorized && _state.value.session != null) {
+            pushNotification(NotificationKind.WARNING, "Sesión expirada", "Inicia sesión de nuevo para continuar.")
             clearSession("Tu sesión expiró o fue cerrada. Inicia sesión de nuevo.", null)
         }
         Result.failure(e)
@@ -329,7 +352,23 @@ class AppViewModel(private val services: PlatformServices = platformServices()) 
         Result.failure(ApiFailure(0, e.message ?: "Error inesperado"))
     }
 
-    fun updatePlayer(player: PlayerState) = _state.update { it.copy(player = player) }
+    fun updatePlayer(player: PlayerState) {
+        val old = _state.value.player
+        if (old != null && old.username == player.username) {
+            if (player.nivel > old.nivel) pushNotification(NotificationKind.REWARD, "¡Subiste de nivel!", "Ahora eres nivel ${player.nivel}.")
+            if (player.vidas < old.vidas) {
+                pushNotification(
+                    NotificationKind.WARNING,
+                    if (player.vidas == 0) "Te quedaste sin vidas" else "Perdiste una vida",
+                    if (player.vidas == 0) "Recupera una en la tienda con 25 XP." else "Te quedan ${player.vidas} de ${player.vidasMax}.",
+                )
+            }
+            if (player.vidas > old.vidas) pushNotification(NotificationKind.SUCCESS, "Vida recuperada", "Tienes ${player.vidas} de ${player.vidasMax} vidas.")
+            if (player.trofeos.size > old.trofeos.size) pushNotification(NotificationKind.REWARD, "¡Nuevo trofeo!", "Lo ganaste con tus monedas.")
+            if (player.completados.size > old.completados.size) pushNotification(NotificationKind.SUCCESS, "Nivel completado", "Tu progreso quedó guardado en el servidor.")
+        }
+        _state.update { it.copy(player = player) }
+    }
 
     fun refreshPlayer() {
         if (_state.value.session?.role != Role.ALUMNO) return

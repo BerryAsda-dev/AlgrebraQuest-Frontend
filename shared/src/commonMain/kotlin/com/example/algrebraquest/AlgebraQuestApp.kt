@@ -79,6 +79,10 @@ fun AlgebraQuestApp(vm: AppViewModel = viewModel { AppViewModel() }) {
                 Route.Settings -> SettingsScreen(state, vm)
             }
 
+            // Avisos emergentes globales (nivel, vidas, trofeos, sesión y conexión)
+            val notifications by vm.notifications.collectAsState()
+            com.example.algrebraquest.ui.NotificationHost(notifications, onDismiss = vm::dismissNotification)
+
             // Modal para activar Huella Dactilar o Reconocimiento Facial tras iniciar sesión con contraseña
             if (state.offerBiometric && state.session != null) {
                 Box(
